@@ -978,24 +978,8 @@ void TextEditor::Render() {
 	}
 
 	{ // autocompletion
-		auto lineText  = GetCurrentLineText();
-		auto cursorPos = GetCursorPosition();
-		auto nextChar  = '\0';
-		if ( cursorPos.mColumn < lineText.length() ) {
-			nextChar = lineText[cursorPos.mColumn];
-			lineText = lineText.substr( 0, cursorPos.mColumn );
-		}
-		std::string currentWord = "";
-		if ( nextChar == ' ' || nextChar == '\t' || nextChar == '\r' || nextChar == '\n' || nextChar == '\0' ) {
-			auto spos = lineText.rfind( ' ' );
-			auto tpos = lineText.rfind( '\t' );
-			if ( spos == std::string::npos && tpos == std::string::npos )
-				currentWord = lineText;
-			else if ( spos < tpos && tpos != std::string::npos )
-				currentWord = lineText.substr( tpos + 1 );
-			else if ( spos != std::string::npos )
-				currentWord = lineText.substr( spos + 1 );
-		}
+		auto		cursorPos	= GetCursorPosition();
+		std::string currentWord = GetWordAt( { cursorPos.mLine, cursorPos.mColumn - 1 } );
 		if ( mCurrentWord.length() == 0 && currentWord.length() == 1 ) mCompletion = true;
 		mCurrentWord = currentWord;
 

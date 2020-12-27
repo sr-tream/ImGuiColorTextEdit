@@ -1717,7 +1717,7 @@ bool TextEditor::HasSelection() const {
 }
 
 bool TextEditor::HasCompletionAvalaible() const {
-	return mCompletions.size();
+	return !mCurrentWord.empty() && mCompletions.size();
 }
 
 void TextEditor::Copy() {

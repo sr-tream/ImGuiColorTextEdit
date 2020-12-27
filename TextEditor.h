@@ -223,6 +223,8 @@ public:
 	void SelectAll();
 	bool HasSelection() const;
 
+	bool HasCompletionAvalaible() const;
+
 	void Copy();
 	void Cut();
 	void Paste();
@@ -232,6 +234,8 @@ public:
 	bool CanRedo() const;
 	void Undo( int aSteps = 1 );
 	void Redo( int aSteps = 1 );
+
+	void ToggleCompletion( bool show );
 
 	static const Palette &GetDarkPalette();
 	static const Palette &GetLightPalette();

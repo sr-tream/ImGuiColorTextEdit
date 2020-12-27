@@ -570,14 +570,18 @@ void TextEditor::HandleKeyboardInputs() {
 		io.WantCaptureKeyboard = true;
 		io.WantTextInput	   = true;
 
-		if ( !IsReadOnly() && ctrl && !shift && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Z ) ) )
+		if ( !IsReadOnly() && ctrl && !shift && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Z ) ) ) {
+			mCompletion = false;
 			Undo();
-		else if ( !IsReadOnly() && !ctrl && !shift && alt &&
-				  ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Backspace ) ) )
+		} else if ( !IsReadOnly() && !ctrl && !shift && alt &&
+					ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Backspace ) ) ) {
+			mCompletion = false;
 			Undo();
-		else if ( !IsReadOnly() && ctrl && !shift && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Y ) ) )
+		} else if ( !IsReadOnly() && ctrl && !shift && !alt &&
+					ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Y ) ) ) {
+			mCompletion = false;
 			Redo();
-		else if ( !ctrl && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_UpArrow ) ) ) {
+		} else if ( !ctrl && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_UpArrow ) ) ) {
 			if ( mCompletion ) {
 				if ( mCompletionId )
 					--mCompletionId;
@@ -593,29 +597,38 @@ void TextEditor::HandleKeyboardInputs() {
 					mCompletionId = 0;
 			} else
 				MoveDown( 1, shift );
-		} else if ( !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_LeftArrow ) ) )
+		} else if ( !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_LeftArrow ) ) ) {
+			mCompletion = false;
 			MoveLeft( 1, shift, ctrl );
-		else if ( !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_RightArrow ) ) )
+		} else if ( !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_RightArrow ) ) ) {
+			mCompletion = false;
 			MoveRight( 1, shift, ctrl );
-		else if ( !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_PageUp ) ) )
+		} else if ( !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_PageUp ) ) ) {
+			mCompletion = false;
 			MoveUp( GetPageSize() - 4, shift );
-		else if ( !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_PageDown ) ) )
+		} else if ( !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_PageDown ) ) ) {
+			mCompletion = false;
 			MoveDown( GetPageSize() - 4, shift );
-		else if ( !alt && ctrl && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Home ) ) )
+		} else if ( !alt && ctrl && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Home ) ) ) {
+			mCompletion = false;
 			MoveTop( shift );
-		else if ( ctrl && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_End ) ) )
+		} else if ( ctrl && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_End ) ) ) {
+			mCompletion = false;
 			MoveBottom( shift );
-		else if ( !ctrl && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Home ) ) )
+		} else if ( !ctrl && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Home ) ) ) {
+			mCompletion = false;
 			MoveHome( shift );
-		else if ( !ctrl && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_End ) ) )
+		} else if ( !ctrl && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_End ) ) ) {
+			mCompletion = false;
 			MoveEnd( shift );
-		else if ( !IsReadOnly() && !ctrl && !shift && !alt &&
-				  ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Delete ) ) )
+		} else if ( !IsReadOnly() && !ctrl && !shift && !alt &&
+					ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Delete ) ) ) {
+			mCompletion = false;
 			Delete();
-		else if ( !IsReadOnly() && !ctrl && !shift && !alt &&
-				  ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Backspace ) ) )
+		} else if ( !IsReadOnly() && !ctrl && !shift && !alt &&
+					ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Backspace ) ) ) {
 			Backspace();
-		else if ( !ctrl && !shift && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Insert ) ) )
+		} else if ( !ctrl && !shift && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Insert ) ) )
 			mOverwrite ^= true;
 		else if ( ctrl && !shift && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Insert ) ) )
 			Copy();
@@ -968,8 +981,8 @@ void TextEditor::Render() {
 		auto lineText  = GetCurrentLineText();
 		auto cursorPos = GetCursorPosition();
 		auto nextChar  = '\0';
-		if ( cursorPos.mColumn < lineText.length() - 1 ) {
-			nextChar = lineText[cursorPos.mColumn + 1];
+		if ( cursorPos.mColumn < lineText.length() ) {
+			nextChar = lineText[cursorPos.mColumn];
 			lineText = lineText.substr( 0, cursorPos.mColumn );
 		}
 		std::string currentWord = "";
@@ -986,12 +999,12 @@ void TextEditor::Render() {
 		if ( mCurrentWord.length() == 0 && currentWord.length() == 1 ) mCompletion = true;
 		mCurrentWord = currentWord;
 
-		if ( mCompletion ) {
-			mCompletions.clear();
-			auto lang = GetLanguageDefinition();
-			for ( auto &&def : lang.mIdentifiers )
-				if ( def.first.starts_with( mCurrentWord ) && def.first != mCurrentWord ) mCompletions.push_back( def );
+		mCompletions.clear();
+		auto lang = GetLanguageDefinition();
+		for ( auto &&def : lang.mIdentifiers )
+			if ( def.first.starts_with( mCurrentWord ) && def.first != mCurrentWord ) mCompletions.push_back( def );
 
+		if ( mCompletion ) {
 			if ( !mCurrentWord.empty() && !mCompletions.empty() ) {
 				ImVec2 acPos = CoordinatesToScreenPos( cursorPos );
 				acPos.y += mCharAdvance.y;
@@ -1703,6 +1716,10 @@ bool TextEditor::HasSelection() const {
 	return mState.mSelectionEnd > mState.mSelectionStart;
 }
 
+bool TextEditor::HasCompletionAvalaible() const {
+	return mCompletions.size();
+}
+
 void TextEditor::Copy() {
 	if ( HasSelection() ) {
 		ImGui::SetClipboardText( GetSelectedText().c_str() );
@@ -1776,6 +1793,10 @@ void TextEditor::Undo( int aSteps ) {
 
 void TextEditor::Redo( int aSteps ) {
 	while ( CanRedo() && aSteps-- > 0 ) mUndoBuffer[mUndoIndex++].Redo( this );
+}
+
+void TextEditor::ToggleCompletion( bool show ) {
+	mCompletion = show;
 }
 
 const TextEditor::Palette &TextEditor::GetDarkPalette() {

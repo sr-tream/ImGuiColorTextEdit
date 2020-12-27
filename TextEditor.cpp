@@ -581,6 +581,10 @@ void TextEditor::HandleKeyboardInputs() {
 					ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Y ) ) ) {
 			mCompletion = false;
 			Redo();
+		} else if ( !IsReadOnly() && ctrl && shift && !alt &&
+					ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Z ) ) ) {
+			mCompletion = false;
+			Redo();
 		} else if ( !ctrl && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_UpArrow ) ) ) {
 			if ( mCompletion ) {
 				if ( mCompletionId )

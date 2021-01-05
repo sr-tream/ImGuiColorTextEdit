@@ -984,7 +984,14 @@ void TextEditor::Render() {
 	{ // autocompletion
 		auto		cursorPos	= GetCursorPosition();
 		std::string currentWord = GetWordAt( { cursorPos.mLine, cursorPos.mColumn - 1 } );
-		if ( mCurrentWord.length() == 0 && currentWord.length() == 1 ) mCompletion = true;
+		while ( !currentWord.empty() ) {
+			if ( currentWord.front() >= 'A' && currentWord.front() <= 'Z' ) break;
+			if ( currentWord.front() >= 'a' && currentWord.front() <= 'z' ) break;
+			if ( currentWord.front() >= '0' && currentWord.front() <= '9' ) break;
+			if ( currentWord.front() == '_' || currentWord.front() == '.' || currentWord.front() == ':' ) break;
+			currentWord.erase( 0, 1 );
+		}
+		if ( mCurrentWord.empty() && currentWord.length() == 1 ) mCompletion = true;
 		mCurrentWord = currentWord;
 
 		mCompletions.clear();

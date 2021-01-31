@@ -236,6 +236,7 @@ public:
 	void Redo( int aSteps = 1 );
 
 	void ToggleCompletion( bool show );
+	void ToggleCompletion();
 
 	static const Palette &GetDarkPalette();
 	static const Palette &GetLightPalette();
@@ -356,8 +357,8 @@ private:
 
 	float mLastClick;
 
-	std::string mCurrentWord = "";
-	//	bool													   mCompletion	 = false;
+	std::string												   mCurrentWord	 = "";
+	bool													   mCompletion	 = false;
 	int														   mCompletionId = 0;
 	ImVec2													   mUICursorPos;
 	std::deque<std::pair<std::string, TextEditor::Identifier>> mCompletions;

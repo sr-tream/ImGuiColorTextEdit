@@ -571,23 +571,22 @@ void TextEditor::HandleKeyboardInputs() {
 		io.WantTextInput	   = true;
 
 		if ( !IsReadOnly() && ctrl && !shift && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Z ) ) ) {
-			//			mCompletion = false;
+			mCompletion = false;
 			Undo();
 		} else if ( !IsReadOnly() && !ctrl && !shift && alt &&
 					ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Backspace ) ) ) {
-			//			mCompletion = false;
+			mCompletion = false;
 			Undo();
 		} else if ( !IsReadOnly() && ctrl && !shift && !alt &&
 					ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Y ) ) ) {
-			//			mCompletion = false;
+			mCompletion = false;
 			Redo();
 		} else if ( !IsReadOnly() && ctrl && shift && !alt &&
 					ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Z ) ) ) {
-			//			mCompletion = false;
+			mCompletion = false;
 			Redo();
 		} else if ( !ctrl && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_UpArrow ) ) ) {
-			//			if ( mCompletion ) {
-			if ( mCompletions.size() ) {
+			if ( mCompletion ) {
 				if ( mCompletionId )
 					--mCompletionId;
 				else
@@ -595,8 +594,7 @@ void TextEditor::HandleKeyboardInputs() {
 			} else
 				MoveUp( 1, shift );
 		} else if ( !ctrl && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_DownArrow ) ) ) {
-			//			if ( mCompletion ) {
-			if ( mCompletions.size() ) {
+			if ( mCompletion ) {
 				if ( mCompletionId < mCompletions.size() - 1 )
 					++mCompletionId;
 				else
@@ -604,32 +602,32 @@ void TextEditor::HandleKeyboardInputs() {
 			} else
 				MoveDown( 1, shift );
 		} else if ( !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_LeftArrow ) ) ) {
-			//			mCompletion = false;
+			mCompletion = false;
 			MoveLeft( 1, shift, ctrl );
 		} else if ( !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_RightArrow ) ) ) {
-			//			mCompletion = false;
+			mCompletion = false;
 			MoveRight( 1, shift, ctrl );
 		} else if ( !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_PageUp ) ) ) {
-			//			mCompletion = false;
+			mCompletion = false;
 			MoveUp( GetPageSize() - 4, shift );
 		} else if ( !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_PageDown ) ) ) {
-			//			mCompletion = false;
+			mCompletion = false;
 			MoveDown( GetPageSize() - 4, shift );
 		} else if ( !alt && ctrl && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Home ) ) ) {
-			//			mCompletion = false;
+			mCompletion = false;
 			MoveTop( shift );
 		} else if ( ctrl && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_End ) ) ) {
-			//			mCompletion = false;
+			mCompletion = false;
 			MoveBottom( shift );
 		} else if ( !ctrl && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Home ) ) ) {
-			//			mCompletion = false;
+			mCompletion = false;
 			MoveHome( shift );
 		} else if ( !ctrl && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_End ) ) ) {
-			//			mCompletion = false;
+			mCompletion = false;
 			MoveEnd( shift );
 		} else if ( !IsReadOnly() && !ctrl && !shift && !alt &&
 					ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Delete ) ) ) {
-			//			mCompletion = false;
+			mCompletion = false;
 			Delete();
 		} else if ( !IsReadOnly() && !ctrl && !shift && !alt &&
 					ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Backspace ) ) ) {
@@ -645,9 +643,6 @@ void TextEditor::HandleKeyboardInputs() {
 			Paste();
 		else if ( !IsReadOnly() && ctrl && !shift && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_V ) ) )
 			Paste();
-		//		else if ( !IsReadOnly() && ctrl && !shift && !alt &&
-		//				  ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Space ) ) )
-		//			mCompletion ^= true;
 		else if ( ctrl && !shift && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_X ) ) )
 			Cut();
 		else if ( !ctrl && shift && !alt && ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Delete ) ) )
@@ -656,8 +651,7 @@ void TextEditor::HandleKeyboardInputs() {
 			SelectAll();
 		else if ( !IsReadOnly() && !ctrl && !shift && !alt &&
 				  ImGui::IsKeyPressed( ImGui::GetKeyIndex( ImGuiKey_Enter ) ) ) {
-			//			if ( mCompletion )
-			if ( mCompletions.size() )
+			if ( mCompletion )
 				InsertText( mCompletions[mCompletionId].first.substr( mCurrentWord.length() ) );
 			else
 				EnterCharacter( '\n', false );
@@ -994,7 +988,7 @@ void TextEditor::Render() {
 			if ( currentWord.front() == '_' || currentWord.front() == '.' || currentWord.front() == ':' ) break;
 			currentWord.erase( 0, 1 );
 		}
-		//		if ( mCurrentWord.empty() && currentWord.length() == 1 ) mCompletion = true;
+		if ( mCurrentWord.empty() && currentWord.length() == 1 ) mCompletion = true;
 		mCurrentWord = currentWord;
 
 		mCompletions.clear();
@@ -1002,7 +996,7 @@ void TextEditor::Render() {
 		for ( auto &&def : lang.mIdentifiers )
 			if ( def.first.starts_with( mCurrentWord ) && def.first != mCurrentWord ) mCompletions.push_back( def );
 
-		/*if ( mCompletion )*/ {
+		if ( mCompletion ) {
 			if ( !mCurrentWord.empty() && !mCompletions.empty() ) {
 				ImVec2 acPos = CoordinatesToScreenPos( cursorPos );
 				acPos.y += mCharAdvance.y;
@@ -1023,7 +1017,7 @@ void TextEditor::Render() {
 					if ( ImGui::IsItemHovered() ) ImGui::SetTooltip( "%s", mCompletions[i].second.mDeclaration.data() );
 					if ( ImGui::IsItemClicked() ) {
 						InsertText( mCompletions[i].first.substr( mCurrentWord.length() ) );
-						//						mCompletion	  = false;
+						mCompletion	  = false;
 						mCompletionId = 0;
 					}
 					if ( i == mCompletionId ) ImGui::SetScrollHereY();
@@ -1032,7 +1026,7 @@ void TextEditor::Render() {
 				ImGui::PopAllowKeyboardFocus();
 				ImGui::End();
 			} else {
-				//				mCompletion	  = false;
+				mCompletion	  = false;
 				mCompletionId = 0;
 			}
 		}
@@ -1794,7 +1788,11 @@ void TextEditor::Redo( int aSteps ) {
 }
 
 void TextEditor::ToggleCompletion( bool show ) {
-	//	mCompletion = show;
+	mCompletion = show;
+}
+
+void TextEditor::ToggleCompletion() {
+	mCompletion ^= true;
 }
 
 const TextEditor::Palette &TextEditor::GetDarkPalette() {
